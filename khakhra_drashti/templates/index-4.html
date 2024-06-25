@@ -1,0 +1,75 @@
+<!doctype html>
+<html class="no-js" lang="zxx">
+<head>
+    <!-- Metadata and CSS links -->
+</head>
+<body>
+<!-- Cart Display -->
+<div id="cart">
+    <h3>Cart</h3>
+    <p>Total Items: <span id="cart-total-items">{{ cart_products.count }}</span></p>
+    <ul id="cart-products">
+        {% for cart_product in cart_products %}
+            <li>
+                <img src="{{ cart_product.product.image.url }}" alt="{{ cart_product.product.name }}" style="width: 50px; height: 50px;">
+                {{ cart_product.product.name }} - ${{ cart_product.product.price }}
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+
+<!-- Example product list with add/remove buttons -->
+<div class="products">
+    {% for product in products %}
+        <div class="product">
+            <h4>{{ product.name }}</h4>
+            <p>${{ product.price }}</p>
+            <button class="add-to-cart" data-product-id="{{ product.id }}">Add to Cart</button>
+            <button class="remove-from-cart" data-product-id="{{ product.id }}">Remove from Cart</button>
+        </div>
+    {% endfor %}
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('.add-to-cart').click(function() {
+        const productId = $(this).data('product-id');
+        updateCart(productId, 'add');
+    });
+
+    $('.remove-from-cart').click(function() {
+        const productId = $(this).data('product-id');
+        updateCart(productId, 'remove');
+    });
+
+    function updateCart(productId, action) {
+        $.ajax({
+            url: '{% url "update_cart" %}',
+            method: 'POST',
+            data: {
+                'product_id': productId,
+                'action': action,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                $('#cart-total-items').text(response.total_items);
+                $('#cart-products').empty();
+                response.products.forEach(product => {
+                    $('#cart-products').append(
+                        '<li>' +
+                        '<img src="' + product.image_url + '" alt="' + product.name + '" style="width: 50px; height: 50px;">' +
+                        product.name + ' - $' + product.price +
+                        '</li>'
+                    );
+                });
+            },
+            error: function(response) {
+                alert('Error updating cart');
+            }
+        });
+    }
+});
+</script>
+</body>
+</html>
