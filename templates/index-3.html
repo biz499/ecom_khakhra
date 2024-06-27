@@ -524,6 +524,31 @@ $(document).ready(function() {
 });
 </script>
 
+<!-- JavaScript to handle Add to Cart button click -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+        var modalProductImage = document.getElementById('modal-product-image');
+        var modalProductName = document.getElementById('modal-product-name');
+
+        addToCartButtons.forEach(function (button) {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+                var productName = this.getAttribute('data-product-name');
+                var productImage = this.getAttribute('data-product-image');
+
+                // Update modal content with product details
+                modalProductImage.setAttribute('src', productImage);
+                modalProductName.textContent = productName;
+
+                // Show the modal
+                $('#add_to_cart_modal').modal('show');
+            });
+        });
+    });
+</script>
+    <!-- MODAL AREA END -->
+
   
 </body>
 </html>
